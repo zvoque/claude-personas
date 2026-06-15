@@ -16,9 +16,17 @@ function isValidName(name) {
 }
 
 // Personal dir FIRST so a user persona overrides a bundled one of the same name.
+// Bundled dir comes from CLAUDE_PLUGIN_ROOT when set (hook execution, tests),
+// otherwise from this file's own location — this lib always lives at
+// <plugin-root>/hooks/, so <__dirname>/../personas IS the bundled dir. The
+// fallback matters because the /personas command runs the CLI WITHOUT
+// CLAUDE_PLUGIN_ROOT in the environment; without it, bundled personas are
+// invisible to the command.
 function personaDirs() {
   const dirs = [path.join(CLAUDE_DIR, 'personas')];
-  if (process.env.CLAUDE_PLUGIN_ROOT) dirs.push(path.join(process.env.CLAUDE_PLUGIN_ROOT, 'personas'));
+  dirs.push(process.env.CLAUDE_PLUGIN_ROOT
+    ? path.join(process.env.CLAUDE_PLUGIN_ROOT, 'personas')
+    : path.join(__dirname, '..', 'personas'));
   return dirs;
 }
 

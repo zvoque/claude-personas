@@ -1,15 +1,12 @@
 {
-  "name": "claude-modes",
+  "name": "claude-personas",
   "description": "Persistent persona modes for Claude Code.",
-  "owner": {
-    "name": "zvoque",
-    "email": "prod@zvoque.com"
-  },
+  "owner": { "name": "zvoque", "email": "prod@zvoque.com" },
   "plugins": [
     {
-      "name": "modes",
-      "source": "./plugins/modes",
-      "description": "Persistent persona modes — personas that re-assert themselves on every turn until you switch them off, which a plain skill can't do. Two hooks keep the active mode in context each prompt and across session start/resume/compact. Ships contrarian; add your own by dropping a `mode: true` skill, no hook changes needed."
+      "name": "personas",
+      "source": "./plugins/personas",
+      "description": "Persistent persona modes — personas that re-assert every turn until switched off. Command-controlled (/personas), node hooks, single or parallel personas, an on-demand team debate, and a guided persona creator."
     }
   ]
 }

@@ -1,101 +1,90 @@
-# claude-modes
+# claude-personas
 
-Persistent **persona modes** for [Claude Code](https://docs.claude.com/en/docs/claude-code) — personas that stay active on *every* turn until you switch them off.
-
-A normal skill only applies to the turn it's invoked on; the next message, Claude is back to default. `modes` fixes that with two hooks that re-assert the active persona on every prompt, so a mode like `contrarian` keeps challenging you for the whole conversation until you say `stop contrarian`.
-
-Ships one mode today:
-
-- **`contrarian`** — a sharp, skeptical advisor that pressure-tests every decision, plan, or claim instead of validating it. Names the load-bearing assumption, fires three concrete counterarguments, proposes a superior alternative, surfaces the blind-spot risk, and ends with a verdict: **Proceed / Reconsider / Stop**. (It steps aside for genuinely destructive or clarifying requests.)
+Persistent personas for [Claude Code](https://docs.claude.com/en/docs/claude-code) -- personas that stay active on every turn until you switch them off.
 
 ## Install
 
 ```
-/plugin marketplace add zvoque/claude-modes
-/plugin install modes@claude-modes
+/plugin marketplace add zvoque/claude-personas
+/plugin install personas@claude-personas
 ```
 
-That's it — no install script, no `settings.json` edits. The plugin registers its own hooks. Start a new session, or just send your next prompt; the `UserPromptSubmit` hook is live immediately.
+No install scripts, no manual `settings.json` edits. The plugin registers its own hooks. Start a new session (or just send your next prompt) and the hooks are live.
 
-**No runtime dependencies.** The hooks are plain **bash + awk** — no Node, `jq`, or Python — so they run on every Claude Code install method (npm *or* the native binary, where `node` isn't guaranteed on `PATH`). bash is the only interpreter Claude Code guarantees for hooks.
+**Requires Node.** The hooks and CLI are plain Node.js scripts. bash is used only by the test harness.
 
 ## Usage
 
-| Type this | Effect |
-|---|---|
-| `/contrarian` or `contrarian mode` | activate — persona applies from this turn on |
-| `/contrarian off` or `stop contrarian` | deactivate contrarian |
-| `normal mode` | deactivate whatever mode is active |
+Control is via the `/personas` command. There are no natural-language triggers; the hooks never parse prompts for control.
 
-Triggers are case-insensitive. Deactivation is checked before activation, so `stop contrarian` never reads as "start". Natural-language triggers (`contrarian mode`, `stop contrarian`) only fire for a mode that actually exists, so ordinary phrases like "in CSS, normal mode means…" won't trip it — except `normal mode`, which is treated as a global off when it's the whole message.
+| Command | Effect |
+|---|---|
+| `/personas <name>` | Activate a persona. In solo mode, replaces the current one. In parallel mode, appends it. |
+| `/personas off` | Deactivate all active personas. |
+| `/personas off <name>` | Deactivate one specific persona. |
+| `/personas solo` | Switch to solo mode (only one persona active at a time). |
+| `/personas parallel` | Switch to parallel mode (multiple personas active; a soft warning fires past ~4). |
+| `/personas list` | List available personas; active ones are marked with `*`. Shows current mode. |
+| `/personas delete <name>` | Delete a personal persona. Refuses to delete bundled-only personas. |
+| `/personas new` | (Phase 2) Persona creator interview -- not yet available. |
+| `/personas team [topic]` | (Phase 3) Structured debate between personas -- not yet available. |
 
 ## How it works
 
+**Personas are plain data files, not skills.** Each persona is a Markdown file with `name` and `description` in its frontmatter followed by the persona instructions. Bundled personas live at `plugins/personas/personas/<name>.md`. Personal personas live at `~/.claude/personas/<name>.md`. A personal persona with the same name as a bundled one overrides it.
+
+**Two hooks manage persistence:**
+
 | Event | Hook | What it does |
 |---|---|---|
-| `UserPromptSubmit` | `modes-tracker.sh` | Runs every prompt. Detects on/off triggers, manages the active-mode flag at `~/.claude/.modes-active`, and while a mode is active re-injects the persona each turn via `hookSpecificOutput.additionalContext`. Re-injecting every turn is what makes the persona persist; on "off" it stops re-asserting and injects a one-time override telling Claude to drop the persona. |
-| `SessionStart` | `modes-activate.sh` | Injects the persona up front on session start / resume / clear / compact when a mode is already active, so it's in context before your first prompt. |
+| `UserPromptSubmit` | `personas-tracker.js` | Runs on every prompt. While a persona is active, re-injects the full persona body into `hookSpecificOutput.additionalContext`. That re-injection each turn is what makes the persona stick. The hook self-suppresses on `/personas` command turns so the command itself runs cleanly. |
+| `SessionStart` | `personas-activate.js` | Injects the active persona(s) on turn 0 of a new or resumed session, so the persona is in context before the first prompt. |
 
-- **`modes-lib.sh`** — shared core (bash + awk): flag I/O, mode-name validation (path-traversal guard), mode-skill resolution, persona reading (YAML frontmatter stripped before injection), and JSON-escaped context emission.
-- **`skills/<mode>/SKILL.md`** — the single source of truth for each persona. Because it's a real skill, `/<mode>` also works as a one-shot native invocation; the hooks read the same file for persistence.
+**`personas-ctl.js` is the sole writer of state and persona files.** Both the `/personas` command and the hooks go through it. State is stored at `~/.claude/.personas-active` (JSON).
 
-Every hook swallows all errors and exits 0 — it can never block a prompt or a session start. The active mode is a single flag at `~/.claude/.modes-active` (user-level, so it persists across projects). Set `MODES_DEBUG=1` in your environment to log hook decisions to `~/.claude/.modes-debug.log`.
+**Default injection is the full persona body each turn.** Set `PERSONAS_TERSE=1` in your environment to switch to a short re-assertion once the persona has been validated in the current session. Whether terse mode is safe for long sessions is a tracked gate -- see `tests/SMOKE.md`.
 
-## Adding a new mode
+## Adding a persona
 
-A mode is just a skill whose frontmatter declares `mode: true`. The tracker dispatches **any** mode name dynamically — **you never edit a hook or `hooks.json` to add one.** There are two ways to add one, depending on whether it's just for you or you want to ship it.
+The fastest path is `/personas new` -- but that ships in Phase 2 and is not available yet.
 
-### A. Personal mode (just for you — no fork)
-
-Drop a skill into your user skills directory:
+Until then, drop a Markdown file into `~/.claude/personas/`:
 
 ```
-~/.claude/skills/<name>/SKILL.md
+~/.claude/personas/<name>.md
 ```
+
+Frontmatter must include `name` and `description`:
 
 ```markdown
 ---
 name: <name>
-description: <when Claude should offer this skill>
-mode: true
+description: <short description>
 ---
 
-<persona instructions — written as if addressed to Claude>
+<persona instructions -- written as if addressed to Claude>
 ```
 
-The hooks resolve modes from **both** the installed plugin **and** `~/.claude/skills`, so a mode you drop here works immediately — activate with `/<name>` or `<name> mode`, turn off with `stop <name>`. Nothing to reinstall; the installed marketplace plugin stays untouched.
+The hooks pick up personal personas immediately. No reinstall needed.
 
-### B. Bundled mode (ship it in this repo)
+To contribute a bundled persona, add the file to `plugins/personas/personas/<name>.md` and open a PR.
 
-Add the skill to the plugin and open a PR:
+## Coexistence with other plugins
 
-```
-plugins/modes/skills/<name>/SKILL.md
-```
+`claude-personas` uses isolated state (`.personas-active`) and its own `/personas` namespace; it never edits `settings.json`. It stacks additively with other persona or lifecycle plugins (caveman, ponytail, etc.) -- that is the platform's nature. When those other plugins are also active, their rules and this plugin's rules all apply.
 
-Same frontmatter as above. Then `bash tests/run.sh` to confirm it loads, commit, and push. Users pick it up with `/plugin update`. (A bundled mode of the same name wins over a personal one.)
+For a clean `/personas team` debate (Phase 3), you will want to pause other persona plugins for that session. This plugin only guarantees that its own persona injection is suppressed on the moderator turn; it cannot silence other plugins.
 
-### Rules for either path
+## Upgrading from v1 (claude-modes)
 
-- Frontmatter **must** include `mode: true`. Without it the skill still works as a one-shot `/<name>`, but it won't *persist* — the hooks ignore any skill not marked as a mode, so ordinary skills can never be hijacked into a persistent persona.
-- Mode names must be lowercase, start with a letter or digit, and use only `a–z`, `0–9`, and `-`.
-- Write the body as instructions addressed to Claude (see [`contrarian/SKILL.md`](plugins/modes/skills/contrarian/SKILL.md) for a worked example). Give it a **persistence** clause and an **off** clause so the persona knows it's meant to stick and when to stand down.
+v2 (this repo) supersedes `claude-modes`. The hook architecture changed from bash to Node, and the `/personas` command replaces the old natural-language triggers and mode-specific slash commands.
 
-## Coexistence with the caveman plugin
+v2 never edits `settings.json`, so leftover v1 entries will not break anything, but to keep things tidy remove them by hand:
 
-If you also run the [caveman](https://github.com/) persona plugin (the one this is modeled on), the two are independent and additive: `modes` uses the flag `~/.claude/.modes-active`, caveman uses `~/.claude/.caveman-active`, and neither touches the other. Both emit `SessionStart` context, so both rulesets stack when both are on. caveman is not required.
+1. Open `~/.claude/settings.json` and delete any hook entries that reference `modes-*.js` or `modes-*.sh`.
+2. Delete `~/.claude/hooks/modes-tracker.js`, `modes-activate.js`, `modes-lib.js`, and `patch-settings.js` if they exist.
 
-## Caveat
-
-Whether an unregistered slash command's raw text reaches the `UserPromptSubmit` hook is undocumented in Claude Code. It doesn't matter here: `/contrarian` is a real skill (so it loads natively even if the hook never sees the text), and the natural-language triggers always pass through. If you add a mode whose name collides with a built-in slash command, prefer the natural-language trigger (`<name> mode`).
-
-## Development
-
-```
-bash tests/run.sh
-```
-
-The suite runs the hooks against a throwaway sandbox `HOME` (your real `~/.claude` is never touched) and verifies activation, persistence, `SessionStart` resume, deactivation, the `normal mode` global off, false-positive guards, path-traversal rejection, and the personal-mode (`~/.claude/skills`) fallback.
+Then reinstall as described above.
 
 ## License
 

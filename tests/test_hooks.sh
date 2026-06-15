@@ -21,4 +21,11 @@ t "terse mode is short"; contains "$out" "contrarian"; ncontains "$out" "BE SHAR
 out="$(printf '{"prompt":"/personas list"}' | node "$TRACKER")"
 t "suppress on /personas turn"; eq "$out" ""
 
+out="$(printf '{"hook_event_name":"SessionStart","source":"resume"}' | node "$ACTIVATE")"
+t "activate injects full when active"; contains "$out" "BE SHARP."; contains "$out" "additionalContext"
+t "activate echoes event"; contains "$out" '"SessionStart"'
+node "$CTL" off >/dev/null
+out="$(printf '{"hook_event_name":"SessionStart"}' | node "$ACTIVATE")"
+t "activate silent when none"; eq "$out" ""
+
 finish

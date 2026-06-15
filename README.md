@@ -1,6 +1,8 @@
 # claude-personas
 
-Persistent personas for [Claude Code](https://docs.claude.com/en/docs/claude-code) -- personas that stay active on every turn until you switch them off.
+Persistent **personas** for [Claude Code](https://docs.claude.com/en/docs/claude-code) -- named characters (a sharp skeptic, a numbers-driven analyst, a lazy senior dev) that stay in character on *every* turn until you switch them off.
+
+A normal skill or prompt shapes a single reply, then Claude drifts back to default. A persona doesn't: a hook re-asserts it each turn, so `contrarian` keeps pressure-testing you for the whole session -- not just the message you invoked it on. Run one at a time (**solo**), several at once (**parallel**), author your own through a guided interview, or convene them as a **team** that debates a topic and reports back.
 
 ## Install
 
@@ -28,6 +30,14 @@ Control is via the `/personas` command. There are no natural-language triggers; 
 | `/personas delete <name>` | Delete a personal persona. Refuses to delete bundled-only personas. |
 | `/personas new` | Create a persona through a guided interview. |
 | `/personas team [topic]` | Convene your personas as a debate panel on a topic, then synthesize. |
+
+## Bundled personas
+
+Ships with one persona to start; create your own with `/personas new` or drop a file into `~/.claude/personas/`.
+
+| Persona | What it does |
+|---|---|
+| `contrarian` | A sharp, skeptical advisor that pressure-tests every decision instead of validating it: names the load-bearing assumption, fires three concrete counterarguments, proposes a superior alternative, surfaces the blind-spot risk, and ends with a verdict (**Proceed / Reconsider / Stop**). Persists every turn; steps aside for destructive actions and direct questions. |
 
 ## How it works
 
@@ -73,16 +83,9 @@ To contribute a bundled persona, add the file to `plugins/personas/personas/<nam
 
 For a clean `/personas team` debate, you will want to pause other persona plugins for that session. This plugin only guarantees that its own persona injection is suppressed on the moderator turn; it cannot silence other plugins.
 
-## Upgrading from v1 (claude-modes)
+## Credits
 
-v2 (this repo) supersedes `claude-modes`. The hook architecture changed from bash to Node, and the `/personas` command replaces the old natural-language triggers and mode-specific slash commands.
-
-v2 never edits `settings.json`, so leftover v1 entries will not break anything, but to keep things tidy remove them by hand:
-
-1. Open `~/.claude/settings.json` and delete any hook entries that reference `modes-*.js` or `modes-*.sh`.
-2. Delete `~/.claude/hooks/modes-tracker.js`, `modes-activate.js`, `modes-lib.js`, and `patch-settings.js` if they exist.
-
-Then reinstall as described above.
+Inspired by [caveman](https://github.com/JuliusBrussee/caveman) -- the persona-mode plugin that pioneered the hook-driven "stay in character every turn" pattern this builds on. `claude-personas` generalizes that idea: any number of user-defined personas, solo / parallel / team modes, and a guided creator.
 
 ## License
 

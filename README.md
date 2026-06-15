@@ -77,7 +77,7 @@ Injection defaults to the **full** persona body each turn. Set `PERSONAS_TERSE=1
 
 ## Team debates
 
-`/personas team [topic]` turns your personas into a panel that argues a question. Claude acts as **moderator** — casts the panel, runs the rounds, and hands you a synthesis. Your active personas are **auto-paused** for the duration so they can't bias the moderator, then restored when it's done — your enabled set and solo/parallel mode are never touched (and a stranded pause self-heals on the next session).
+`/personas team [topic]` turns your personas into a panel that argues a question. Claude acts as **moderator** — casts the panel, runs the rounds, and hands you a synthesis. Your active personas are **auto-paused** for the duration so they can't bias the moderator, then restored when it's done — your enabled set and solo/parallel mode are never touched (and if a debate ever dies before cleanup, the pause self-heals on its own — it auto-expires, no restart needed).
 
 1. **Cast the roster.** You pick which personas debate (your currently-active ones are pre-selected). The panel is independent of solo/parallel mode — convening a team doesn't change what's active.
 2. **Fill the gaps (auto-cast).** A debate is only useful if the sides genuinely disagree. If your picks are too aligned — or one is a pure *style* with no stance to argue — it offers to **auto-cast** extra debaters drawn for the topic (a skeptic, an opposing stakeholder) to create real friction. These are ephemeral: used for this debate only, never saved. Want to keep one? `/personas new`.

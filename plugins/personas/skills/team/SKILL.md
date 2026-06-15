@@ -130,7 +130,7 @@ Two parts:
 After synthesis, shut the team down **and restore the user's personas**:
 1. `SendMessage` each persona `{type: "shutdown_request"}`.
 2. Once all are down, `TeamDelete`.
-3. **Restore the user's personas (auto).** Run `node "${CLAUDE_PLUGIN_ROOT}/hooks/personas-ctl.js" resume` and confirm in one line (e.g. "Restored: contrarian"). This MUST run **last**, and **even if the debate errored or was cut short** — otherwise injection stays paused. (Safety net: a fresh session auto-restores a stranded pause, but don't rely on it.)
+3. **Restore the user's personas (auto).** Run `node "${CLAUDE_PLUGIN_ROOT}/hooks/personas-ctl.js" resume` and confirm in one line (e.g. "Restored: contrarian"). This MUST run **last**, and **even if the debate errored or was cut short** — otherwise injection stays paused. (Safety net: a stranded pause also auto-expires on its own within ~30 min, and any manual activation or fresh session clears it instantly — but don't rely on it; always run `resume`.)
 
 Do all of this even if the debate is cut short. Don't leave agents running or personas paused.
 

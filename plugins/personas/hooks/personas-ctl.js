@@ -70,7 +70,7 @@ function cmdStatus() {
   const s = m.readState();
   say(`mode: ${s.mode}`);
   say(`active: ${s.enabled.join(', ') || 'none'}`);
-  if (s.suspended) say('suspended: yes — paused for a team debate; restores on restart or when you next activate a persona');
+  if (s.suspended) say('suspended: yes — paused for a team debate; auto-restores shortly on its own (or instantly when you next activate a persona)');
 }
 
 // create reads the body from stdin (never an arg — avoids escaping a multi-line

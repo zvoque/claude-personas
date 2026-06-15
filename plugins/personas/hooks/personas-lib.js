@@ -10,6 +10,10 @@ const CLAUDE_DIR = path.join(os.homedir(), '.claude');
 const STATE_FILE = path.join(CLAUDE_DIR, '.personas-active');
 const RESERVED = ['list', 'status', 'off', 'on', 'solo', 'parallel', 'team', 'new', 'delete', 'help', 'suspend', 'resume'];
 const NAME_RE = /^[a-z0-9][a-z0-9-]*$/;
+// A team-debate pause auto-expires after this long, so a debate that never runs
+// its cleanup can't strand the user's personas in the off state — it self-heals
+// with no restart and no user action. Generous enough to outlast any real debate.
+const SUSPEND_TTL_MS = 30 * 60 * 1000;
 
 function isValidName(name) {
   return typeof name === 'string' && NAME_RE.test(name) && RESERVED.indexOf(name) === -1;
@@ -50,7 +54,13 @@ function readState() {
   let enabled = (s && Array.isArray(s.enabled)) ? s.enabled.filter(isValidName) : [];
   enabled = enabled.filter((n) => personaFile(n));          // prune dangling
   if (mode === 'solo' && enabled.length > 1) enabled = enabled.slice(-1);
-  const suspended = !!(s && s.suspended === true);          // team-debate pause flag
+  // Team-debate pause, honored only within the TTL so a forgotten cleanup can't
+  // strand personas off — past the window it reads as not-suspended (self-heals).
+  let suspended = false;
+  if (s && s.suspended === true) {
+    const at = typeof s.suspended_at === 'number' ? s.suspended_at : 0;
+    suspended = (Date.now() - at) < SUSPEND_TTL_MS;
+  }
   return { mode, enabled, suspended };
 }
 
@@ -59,7 +69,10 @@ function writeState(state) {
   const tmp = STATE_FILE + '.tmp';
   const mode = state.mode === 'parallel' ? 'parallel' : 'solo';   // never write an invalid mode
   const out = { mode, enabled: state.enabled };
-  if (state.suspended === true) out.suspended = true;      // omit when false → clean file
+  if (state.suspended === true) {                          // omit when false → clean file
+    out.suspended = true;
+    out.suspended_at = typeof state.suspended_at === 'number' ? state.suspended_at : Date.now();
+  }
   fs.writeFileSync(tmp, JSON.stringify(out) + '\n');
   fs.renameSync(tmp, STATE_FILE);                           // atomic
 }

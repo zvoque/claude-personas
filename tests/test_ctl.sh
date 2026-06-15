@@ -22,4 +22,21 @@ t "personal overrides bundled"; eq "$(libcall 'console.log(m.readPersonaBody("co
 printf -- '---\nname: ghost\ndescription: x\n---\nG.\n' > "$HOME/.claude/personas/ghost.md"
 t "list union sorted"; eq "$(libcall 'console.log(m.listPersonas().join(","))')" "contrarian,ghost"
 
+# ===== injection + helpers =====
+reset
+printf -- '---\nname: contrarian\ndescription: x\n---\nBE SHARP.\n' > "$HOME/.claude/personas/contrarian.md"
+printf -- '---\nname: hype\ndescription: x\n---\nBE LOUD.\n' > "$HOME/.claude/personas/hype.md"
+t "isPersonasCommand yes"; eq "$(libcall 'console.log(m.isPersonasCommand("/personas team x"))')" "true"
+t "isPersonasCommand no";  eq "$(libcall 'console.log(m.isPersonasCommand("about the personas feature"))')" "false"
+t "full solo body"; eq "$(libcall 'console.log(m.fullInjection({mode:"solo",enabled:["contrarian"]}))')" "BE SHARP."
+out="$(libcall 'console.log(m.fullInjection({mode:"parallel",enabled:["contrarian","hype"]}))')"
+t "full parallel header"; contains "$out" "Respond as each in turn"
+t "full parallel both"; contains "$out" "BE SHARP."; contains "$out" "BE LOUD."
+out="$(libcall 'console.log(m.shortReassertion({mode:"solo",enabled:["contrarian"]}))')"
+t "short names persona"; contains "$out" "contrarian"
+t "short is short"; ncontains "$out" "BE SHARP."
+out="$(libcall 'm.emitContext("UserPromptSubmit","hi \"q\"\nline2")')"
+t "emit valid JSON"; eq "$(node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{console.log(JSON.parse(s).hookSpecificOutput.additionalContext)})' <<<"$out")" 'hi "q"
+line2'
+
 finish

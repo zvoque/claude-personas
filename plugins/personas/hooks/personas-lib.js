@@ -77,8 +77,43 @@ function readPersonaBody(name) {
   try { return stripFrontmatter(fs.readFileSync(f, 'utf8')); } catch (_) { return null; }
 }
 
+function isPersonasCommand(prompt) {
+  return /^\s*\/personas(\s|$)/i.test(String(prompt || ''));
+}
+
+const PARALLEL_HEADER =
+  'Multiple personas are active. Respond as each in turn, clearly labeled, in one message. Personas do not address one another.';
+
+function fullInjection(state) {
+  const parts = [];
+  for (const n of state.enabled) {
+    const b = readPersonaBody(n);
+    if (b) parts.push({ n, b });
+  }
+  if (!parts.length) return null;
+  if (state.mode === 'parallel' && parts.length > 1) {
+    return PARALLEL_HEADER + '\n\n' + parts.map((p) => `## Persona: ${p.n}\n${p.b}`).join('\n\n');
+  }
+  return parts[0].b;
+}
+
+function shortReassertion(state) {
+  const names = state.enabled.filter((n) => readPersonaBody(n));
+  if (!names.length) return null;
+  if (state.mode === 'parallel' && names.length > 1) {
+    return `Personas active — respond as each in turn, labeled, one message; they do not address each other: ${names.join(', ')}. Maintain each as established earlier.`;
+  }
+  return `Persona active: ${names[0]}. Maintain it as established earlier — keep its structure and voice.`;
+}
+
+function emitContext(event, text) {
+  if (!text) return;
+  process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: event, additionalContext: text } }));
+}
+
 module.exports = {
   CLAUDE_DIR, STATE_FILE, RESERVED,
   isValidName, personaDirs, personaFile, defaultState, readState, writeState,
   listPersonas, stripFrontmatter, readPersonaBody,
+  isPersonasCommand, fullInjection, shortReassertion, emitContext,
 };

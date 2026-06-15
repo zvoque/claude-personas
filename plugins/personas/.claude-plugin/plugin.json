@@ -2,7 +2,7 @@
   "name": "personas",
   "displayName": "Personas",
   "description": "Persistent persona modes — personas that re-assert every turn until switched off. Command-controlled (/personas), node hooks, single or parallel personas, an on-demand team debate, and a guided persona creator.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": { "name": "zvoque" },
   "homepage": "https://github.com/zvoque/claude-personas",
   "repository": "https://github.com/zvoque/claude-personas",

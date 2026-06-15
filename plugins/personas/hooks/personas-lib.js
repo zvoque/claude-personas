@@ -68,7 +68,7 @@ function listPersonas() {
 }
 
 function stripFrontmatter(text) {
-  return text.replace(/^﻿?---\r?\n[\s\S]*?\r?\n---\r?\n?/, '').trim();
+  return text.replace(/^\uFEFF?---\r?\n[\s\S]*?\r?\n---\r?\n?/, '').trim();
 }
 
 function readPersonaBody(name) {

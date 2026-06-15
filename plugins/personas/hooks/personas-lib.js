@@ -8,7 +8,7 @@ const path = require('path');
 
 const CLAUDE_DIR = path.join(os.homedir(), '.claude');
 const STATE_FILE = path.join(CLAUDE_DIR, '.personas-active');
-const RESERVED = ['list', 'status', 'off', 'on', 'solo', 'parallel', 'team', 'new', 'delete', 'help'];
+const RESERVED = ['list', 'status', 'off', 'on', 'solo', 'parallel', 'team', 'new', 'delete', 'help', 'suspend', 'resume'];
 const NAME_RE = /^[a-z0-9][a-z0-9-]*$/;
 
 function isValidName(name) {
@@ -39,7 +39,7 @@ function personaFile(name) {
   return null;
 }
 
-function defaultState() { return { mode: 'solo', enabled: [] }; }
+function defaultState() { return { mode: 'solo', enabled: [], suspended: false }; }
 
 function readState() {
   let raw;
@@ -50,14 +50,17 @@ function readState() {
   let enabled = (s && Array.isArray(s.enabled)) ? s.enabled.filter(isValidName) : [];
   enabled = enabled.filter((n) => personaFile(n));          // prune dangling
   if (mode === 'solo' && enabled.length > 1) enabled = enabled.slice(-1);
-  return { mode, enabled };
+  const suspended = !!(s && s.suspended === true);          // team-debate pause flag
+  return { mode, enabled, suspended };
 }
 
 function writeState(state) {
   fs.mkdirSync(CLAUDE_DIR, { recursive: true });
   const tmp = STATE_FILE + '.tmp';
   const mode = state.mode === 'parallel' ? 'parallel' : 'solo';   // never write an invalid mode
-  fs.writeFileSync(tmp, JSON.stringify({ mode, enabled: state.enabled }) + '\n');
+  const out = { mode, enabled: state.enabled };
+  if (state.suspended === true) out.suspended = true;      // omit when false → clean file
+  fs.writeFileSync(tmp, JSON.stringify(out) + '\n');
   fs.renameSync(tmp, STATE_FILE);                           // atomic
 }
 

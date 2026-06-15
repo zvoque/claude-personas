@@ -18,6 +18,7 @@ function cmdEnable(name) {
   const s = m.readState();
   const rest = s.enabled.filter((n) => n !== name);
   s.enabled = s.mode === 'solo' ? [name] : rest.concat(name);
+  s.suspended = false;                        // a manual activation ends any team-debate pause
   m.writeState(s);
   say(`enabled ${name} (${s.mode}); active: ${s.enabled.join(', ') || 'none'}`);
 }
@@ -25,6 +26,7 @@ function cmdEnable(name) {
 function cmdDisable(name) {                 // no name → clear all
   const s = m.readState();
   s.enabled = name ? s.enabled.filter((n) => n !== name) : [];
+  s.suspended = false;
   m.writeState(s);
   say(`${name ? 'disabled ' + name : 'cleared all'}; active: ${s.enabled.join(', ') || 'none'}`);
 }
@@ -33,8 +35,27 @@ function cmdMode(mode) {
   const s = m.readState();
   s.mode = mode;
   if (mode === 'solo' && s.enabled.length > 1) s.enabled = s.enabled.slice(-1);
+  s.suspended = false;
   m.writeState(s);
   say(`mode: ${mode}; active: ${s.enabled.join(', ') || 'none'}`);
+}
+
+// Pause/restore ambient injection around a /personas team debate WITHOUT touching
+// the enabled set — so a crashed debate can't lose the user's personas (the flag
+// is recovered on restart and by any manual activation). Called by the team skill.
+function cmdSuspend() {
+  const s = m.readState();
+  const paused = s.enabled.slice();
+  s.suspended = true;
+  m.writeState(s);
+  say(`suspended injection for the debate; paused ${paused.length} persona(s): ${paused.join(', ') || 'none'} (restored with: resume)`);
+}
+
+function cmdResume() {
+  const s = m.readState();
+  s.suspended = false;
+  m.writeState(s);
+  say(`resumed injection; active: ${s.enabled.join(', ') || 'none'}`);
 }
 
 function cmdList() {
@@ -49,6 +70,7 @@ function cmdStatus() {
   const s = m.readState();
   say(`mode: ${s.mode}`);
   say(`active: ${s.enabled.join(', ') || 'none'}`);
+  if (s.suspended) say('suspended: yes — paused for a team debate; restores on restart or when you next activate a persona');
 }
 
 // create reads the body from stdin (never an arg — avoids escaping a multi-line
@@ -113,6 +135,8 @@ function main() {
     case 'off':      return cmdDisable(rest[0]);
     case 'solo':     return cmdMode('solo');
     case 'parallel': return cmdMode('parallel');
+    case 'suspend':  return cmdSuspend();
+    case 'resume':   return cmdResume();
     case 'list':     return cmdList();
     case 'status':
     case undefined:  return cmdStatus();

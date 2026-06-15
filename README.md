@@ -77,14 +77,14 @@ Injection defaults to the **full** persona body each turn. Set `PERSONAS_TERSE=1
 
 ## Team debates
 
-`/personas team [topic]` turns your personas into a panel that argues a question. Claude acts as **moderator** — casts the panel, runs the rounds, and hands you a synthesis.
+`/personas team [topic]` turns your personas into a panel that argues a question. Claude acts as **moderator** — casts the panel, runs the rounds, and hands you a synthesis. Your active personas are **auto-paused** for the duration so they can't bias the moderator, then restored when it's done — your enabled set and solo/parallel mode are never touched (and a stranded pause self-heals on the next session).
 
 1. **Cast the roster.** You pick which personas debate (your currently-active ones are pre-selected). The panel is independent of solo/parallel mode — convening a team doesn't change what's active.
 2. **Fill the gaps (auto-cast).** A debate is only useful if the sides genuinely disagree. If your picks are too aligned — or one is a pure *style* with no stance to argue — it offers to **auto-cast** extra debaters drawn for the topic (a skeptic, an opposing stakeholder) to create real friction. These are ephemeral: used for this debate only, never saved. Want to keep one? `/personas new`.
 3. **They argue.** Each debater is spawned as its own agent, and they go at it via native inter-agent messaging — opening positions, direct clashes, a pressure round — rather than one model puppeting every side.
 4. **You get a synthesis.** Key tensions, where they converged, the strongest point each side landed, what the answer depends on, and a verdict.
 
-**Requires agent-teams support.** The full version spawns real sub-agents (Claude Code's agent teams). Where that isn't available it falls back to a single-context role-play of the same rounds — still useful, just less independent. For the cleanest debate, `/personas off` other persona plugins first; otherwise their hooks lean on the moderator.
+**Requires agent-teams support.** The full version spawns real sub-agents (Claude Code's agent teams). Where that isn't available it falls back to a single-context role-play of the same rounds — still useful, just less independent. This plugin's own personas pause automatically during the debate; for the cleanest result, also pause *other* persona plugins ([caveman](https://github.com/JuliusBrussee/caveman), [ponytail](https://github.com/DietrichGebert/ponytail)) — it can only control its own.
 
 ## Adding a persona
 

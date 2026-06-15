@@ -23,6 +23,7 @@ async function main() {
   try { input = JSON.parse(await readStdin()) || {}; } catch (_) { input = {}; }
   if (m.isPersonasCommand(input.prompt)) return;            // self-suppress
   const state = m.readState();
+  if (state.suspended) return;                              // paused for a /personas team debate
   const text = process.env.PERSONAS_TERSE === '1' ? m.shortReassertion(state) : m.fullInjection(state);
   if (text) m.emitContext('UserPromptSubmit', text);
 }

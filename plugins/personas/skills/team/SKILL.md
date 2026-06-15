@@ -17,9 +17,9 @@ Invoked by `/personas team [topic]` (and natural-language "debate this with my p
 
 If no topic is given, ask for one. If the topic is ambiguous about **what's being decided**, ask one tight clarifying question before casting. Otherwise proceed; don't over-interrogate.
 
-**Moderator neutrality (you are the moderator).** This runs on a `/personas team` turn, so the persona hook self-suppresses for this turn — no active persona should contaminate you. Stay neutral regardless. Belt-and-suspenders: if you notice a persona instruction has leaked into your context, ignore it while moderating; if needed, produce the final synthesis from a clean subagent that receives only the transcript.
+**Moderator neutrality (you are the moderator).** Two layers keep the user's active personas from biasing you: the hook self-suppresses on this `/personas team` turn, and Section 3 auto-**suspends** ambient injection for the whole debate (this covers multi-turn debates — later turns wouldn't self-suppress on their own). Stay neutral regardless. Belt-and-suspenders: if a persona instruction still leaks into your context, ignore it while moderating; if needed, produce the final synthesis from a clean subagent that receives only the transcript.
 
-**Orthogonal to ambient state.** Convening a team does NOT change the user's active personas or solo/parallel mode — never run a `/personas` state-mutating command here. Spawned debaters are isolated snapshots, not the user's live personas.
+**Ambient set preserved.** The debate auto-**pauses** persona injection (Section 3) and restores it after (Section 6) — but this does NOT change *which* personas are enabled or the solo/parallel mode. The active set and mode are untouched; only injection is paused. Never run `enable`/`disable`/`off`/`solo`/`parallel` here. Spawned debaters are isolated snapshots, not the user's live personas.
 
 ---
 
@@ -57,6 +57,7 @@ See `references/casting-library.md` for archetypes and anti-patterns to draw gap
 
 Use the native team primitives so personas can message each other directly.
 
+0. **Pause the user's active personas (auto).** Run `node "${CLAUDE_PLUGIN_ROOT}/hooks/personas-ctl.js" suspend`. This pauses ambient persona injection so the user's own active persona(s) can't bias you as moderator across the debate's turns — it does **not** change the active set or mode, and it's restored in Section 6. Tell the user in one line what was paused, from the CLI output (e.g. "Paused contrarian for the debate — back when we're done"). If the call errors, proceed anyway; the turn-level self-suppress still covers this turn.
 1. `TeamCreate` — `team_name` like `debate-<short-topic-slug>`, description = the motion. You are the moderator/team-lead.
 2. Spawn each persona with the **Agent** tool, passing `team_name` and a `name` (the persona's name, kebab/lower e.g. `senior-dev`, `the-skeptic`). Use `subagent_type: "general-purpose"` (or `claude`) so they can reason and search freely — personas don't need file-editing tools but benefit from web/research access for factual debates.
 3. Each persona's spawn `prompt` is its **character brief** — see template below. Spawn them in the **same message** (parallel) so they're all live.
@@ -126,11 +127,12 @@ Two parts:
 
 ## 6. Clean up
 
-After synthesis, shut the team down:
+After synthesis, shut the team down **and restore the user's personas**:
 1. `SendMessage` each persona `{type: "shutdown_request"}`.
 2. Once all are down, `TeamDelete`.
+3. **Restore the user's personas (auto).** Run `node "${CLAUDE_PLUGIN_ROOT}/hooks/personas-ctl.js" resume` and confirm in one line (e.g. "Restored: contrarian"). This MUST run **last**, and **even if the debate errored or was cut short** — otherwise injection stays paused. (Safety net: a fresh session auto-restores a stranded pause, but don't rely on it.)
 
-Do this even if the debate is cut short. Don't leave agents running.
+Do all of this even if the debate is cut short. Don't leave agents running or personas paused.
 
 ---
 

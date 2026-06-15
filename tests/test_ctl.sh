@@ -39,4 +39,24 @@ out="$(libcall 'm.emitContext("UserPromptSubmit","hi \"q\"\nline2")')"
 t "emit valid JSON"; eq "$(node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{console.log(JSON.parse(s).hookSpecificOutput.additionalContext)})' <<<"$out")" 'hi "q"
 line2'
 
+# ===== CLI control =====
+reset
+printf -- '---\nname: contrarian\ndescription: x\n---\nB.\n' > "$HOME/.claude/personas/contrarian.md"
+printf -- '---\nname: hype\ndescription: x\n---\nL.\n' > "$HOME/.claude/personas/hype.md"
+ctl() { node "$CTL" "$@"; }
+ctl enable contrarian >/dev/null
+t "solo enable sets one"; eq "$(libcall 'const s=m.readState();console.log(s.mode+":"+s.enabled.join(","))')" "solo:contrarian"
+ctl enable hype >/dev/null
+t "solo enable replaces"; eq "$(libcall 'console.log(m.readState().enabled.join(","))')" "hype"
+ctl parallel >/dev/null; ctl enable contrarian >/dev/null
+t "parallel appends"; eq "$(libcall 'const s=m.readState();console.log(s.mode+":"+s.enabled.slice().sort().join(","))')" "parallel:contrarian,hype"
+ctl disable hype >/dev/null
+t "disable removes"; eq "$(libcall 'console.log(m.readState().enabled.join(","))')" "contrarian"
+ctl off >/dev/null
+t "off clears all"; eq "$(libcall 'console.log(m.readState().enabled.length)')" "0"
+ctl enable contrarian >/dev/null; ctl enable hype >/dev/null; ctl solo >/dev/null
+t "solo collapses to last"; eq "$(libcall 'const s=m.readState();console.log(s.mode+":"+s.enabled.join(","))')" "solo:hype"
+out="$(ctl list)"; t "list shows mode + marker"; contains "$out" "solo"; contains "$out" "* hype"
+out="$(ctl enable nope 2>&1 || true)"; t "enable unknown errors"; contains "$out" "no such persona"
+
 finish

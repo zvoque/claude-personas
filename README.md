@@ -26,8 +26,8 @@ Control is via the `/personas` command. There are no natural-language triggers; 
 | `/personas parallel` | Switch to parallel mode (multiple personas active; a soft warning fires past ~4). |
 | `/personas list` | List available personas; active ones are marked with `*`. Shows current mode. |
 | `/personas delete <name>` | Delete a personal persona. Refuses to delete bundled-only personas. |
-| `/personas new` | (Phase 2) Persona creator interview -- not yet available. |
-| `/personas team [topic]` | (Phase 3) Structured debate between personas -- not yet available. |
+| `/personas new` | Create a persona through a guided interview. |
+| `/personas team [topic]` | Convene your personas as a debate panel on a topic, then synthesize. |
 
 ## How it works
 
@@ -42,13 +42,11 @@ Control is via the `/personas` command. There are no natural-language triggers; 
 
 **`personas-ctl.js` is the sole writer of state and persona files.** Both the `/personas` command and the hooks go through it. State is stored at `~/.claude/.personas-active` (JSON).
 
-**Default injection is the full persona body each turn.** Set `PERSONAS_TERSE=1` in your environment to switch to a short re-assertion once the persona has been validated in the current session. Whether terse mode is safe for long sessions is a tracked gate -- see `tests/SMOKE.md`.
+**Default injection is the full persona body each turn.** Set `PERSONAS_TERSE=1` in your environment to switch to a short re-assertion instead. Validate that terse mode holds the persona over a long session before relying on it.
 
 ## Adding a persona
 
-The fastest path is `/personas new` -- but that ships in Phase 2 and is not available yet.
-
-Until then, drop a Markdown file into `~/.claude/personas/`:
+The fastest path is `/personas new` -- a guided interview that writes the persona for you. Or drop a Markdown file into `~/.claude/personas/` by hand:
 
 ```
 ~/.claude/personas/<name>.md
@@ -73,7 +71,7 @@ To contribute a bundled persona, add the file to `plugins/personas/personas/<nam
 
 `claude-personas` uses isolated state (`.personas-active`) and its own `/personas` namespace; it never edits `settings.json`. It stacks additively with other persona or lifecycle plugins (caveman, ponytail, etc.) -- that is the platform's nature. When those other plugins are also active, their rules and this plugin's rules all apply.
 
-For a clean `/personas team` debate (Phase 3), you will want to pause other persona plugins for that session. This plugin only guarantees that its own persona injection is suppressed on the moderator turn; it cannot silence other plugins.
+For a clean `/personas team` debate, you will want to pause other persona plugins for that session. This plugin only guarantees that its own persona injection is suppressed on the moderator turn; it cannot silence other plugins.
 
 ## Upgrading from v1 (claude-modes)
 

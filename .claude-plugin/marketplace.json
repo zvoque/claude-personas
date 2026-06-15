@@ -1,4 +1,5 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "claude-personas",
   "description": "Persistent persona modes for Claude Code.",
   "owner": { "name": "zvoque", "email": "prod@zvoque.com" },

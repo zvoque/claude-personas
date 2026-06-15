@@ -1,0 +1,13 @@
+{
+  "name": "modes",
+  "displayName": "Modes",
+  "description": "Persistent persona modes — personas that re-assert themselves on every turn until you switch them off, which a plain skill can't do. Two hooks keep the active mode in context each prompt and across session start/resume/compact. Ships contrarian; add your own by dropping a `mode: true` skill, no hook changes needed.",
+  "version": "0.1.0",
+  "author": {
+    "name": "zvoque"
+  },
+  "homepage": "https://github.com/zvoque/claude-modes",
+  "repository": "https://github.com/zvoque/claude-modes",
+  "license": "MIT",
+  "keywords": ["modes", "persona", "contrarian", "hooks", "context", "persistent"]
+}

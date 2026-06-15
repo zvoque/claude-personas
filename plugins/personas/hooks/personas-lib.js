@@ -52,7 +52,33 @@ function writeState(state) {
   fs.renameSync(tmp, STATE_FILE);                           // atomic
 }
 
+function listPersonas() {
+  const seen = new Set();
+  for (const dir of personaDirs()) {
+    let entries = [];
+    try { entries = fs.readdirSync(dir); } catch (_) { entries = []; }
+    for (const e of entries) {
+      if (e.slice(-3) === '.md') {
+        const n = e.slice(0, -3);
+        if (isValidName(n)) seen.add(n);
+      }
+    }
+  }
+  return Array.from(seen).sort();
+}
+
+function stripFrontmatter(text) {
+  return text.replace(/^﻿?---\r?\n[\s\S]*?\r?\n---\r?\n?/, '').trim();
+}
+
+function readPersonaBody(name) {
+  const f = personaFile(name);
+  if (!f) return null;
+  try { return stripFrontmatter(fs.readFileSync(f, 'utf8')); } catch (_) { return null; }
+}
+
 module.exports = {
   CLAUDE_DIR, STATE_FILE, RESERVED,
   isValidName, personaDirs, personaFile, defaultState, readState, writeState,
+  listPersonas, stripFrontmatter, readPersonaBody,
 };

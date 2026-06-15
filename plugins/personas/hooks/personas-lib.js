@@ -48,7 +48,8 @@ function readState() {
 function writeState(state) {
   fs.mkdirSync(CLAUDE_DIR, { recursive: true });
   const tmp = STATE_FILE + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify({ mode: state.mode, enabled: state.enabled }) + '\n');
+  const mode = state.mode === 'parallel' ? 'parallel' : 'solo';   // never write an invalid mode
+  fs.writeFileSync(tmp, JSON.stringify({ mode, enabled: state.enabled }) + '\n');
   fs.renameSync(tmp, STATE_FILE);                           // atomic
 }
 

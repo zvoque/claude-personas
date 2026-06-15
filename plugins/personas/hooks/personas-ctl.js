@@ -12,6 +12,7 @@ function die(msg) { console.error(msg); process.exit(1); }
 function say(msg) { console.log(msg); }
 
 function cmdEnable(name) {
+  if (!name) die('usage: /personas <name>');
   if (!m.isValidName(name)) die(`invalid name: ${name}`);
   if (!m.personaFile(name)) die(`no such persona: ${name} (try /personas list)`);
   const s = m.readState();
@@ -61,6 +62,7 @@ function bundledPath(name) {
 }
 
 function cmdCreate(name, rest) {
+  if (!name) die('usage: /personas new <name>');
   if (m.RESERVED.indexOf(name) !== -1) die(`"${name}" is a reserved verb; pick another name`);
   if (!m.isValidName(name)) die(`invalid name: ${name} (use a-z, 0-9, -, starting with a letter/digit)`);
   if (fs.existsSync(personalPath(name))) die(`persona already exists: ${name} (delete it first to recreate)`);
@@ -78,6 +80,7 @@ function cmdCreate(name, rest) {
 }
 
 function cmdDelete(name) {
+  if (!name) die('usage: /personas delete <name>');
   if (!m.isValidName(name)) die(`invalid name: ${name}`);
   if (!fs.existsSync(personalPath(name))) {
     if (bundledPath(name) && fs.existsSync(bundledPath(name))) {

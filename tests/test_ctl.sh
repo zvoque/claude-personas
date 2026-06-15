@@ -59,4 +59,17 @@ t "solo collapses to last"; eq "$(libcall 'const s=m.readState();console.log(s.m
 out="$(ctl list)"; t "list shows mode + marker"; contains "$out" "solo"; contains "$out" "* hype"
 out="$(ctl enable nope 2>&1 || true)"; t "enable unknown errors"; contains "$out" "no such persona"
 
+# ===== create / delete =====
+reset
+printf 'Pressure-test everything.\nName the load-bearing assumption.\n' | node "$CTL" create skeptic --desc "sharp skeptic" >/dev/null
+t "create writes personal file"; isfile "$HOME/.claude/personas/skeptic.md"
+t "create body via stdin"; eq "$(libcall 'console.log(m.readPersonaBody("skeptic"))')" "Pressure-test everything.
+Name the load-bearing assumption."
+out="$(node "$CTL" create team --desc x </dev/null 2>&1 || true)"; t "create rejects reserved"; contains "$out" "reserved"
+node "$CTL" enable skeptic >/dev/null; node "$CTL" delete skeptic >/dev/null
+t "delete removes file"; nofile "$HOME/.claude/personas/skeptic.md"
+t "delete cascades state"; eq "$(libcall 'console.log(m.readState().enabled.join(","))')" ""
+printf -- '---\nname: contrarian\ndescription: x\n---\nB.\n' > "$CLAUDE_PLUGIN_ROOT/personas/contrarian.md"
+out="$(node "$CTL" delete contrarian 2>&1 || true)"; t "delete bundled refused"; contains "$out" "bundled"
+
 finish

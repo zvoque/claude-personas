@@ -8,7 +8,7 @@ const path = require('path');
 
 const CLAUDE_DIR = path.join(os.homedir(), '.claude');
 const STATE_FILE = path.join(CLAUDE_DIR, '.personas-active');
-const RESERVED = ['list', 'off', 'on', 'solo', 'parallel', 'team', 'new', 'delete', 'help'];
+const RESERVED = ['list', 'status', 'off', 'on', 'solo', 'parallel', 'team', 'new', 'delete', 'help'];
 const NAME_RE = /^[a-z0-9][a-z0-9-]*$/;
 
 function isValidName(name) {

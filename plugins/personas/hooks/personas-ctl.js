@@ -45,6 +45,12 @@ function cmdList() {
   for (const n of all) say(`${s.enabled.indexOf(n) !== -1 ? '* ' : '  '}${n}`);
 }
 
+function cmdStatus() {
+  const s = m.readState();
+  say(`mode: ${s.mode}`);
+  say(`active: ${s.enabled.join(', ') || 'none'}`);
+}
+
 // create reads the body from stdin (never an arg — avoids escaping a multi-line
 // body). Always invoked with piped stdin (by create-persona / tests); don't run
 // `create` interactively (fd 0 would block on EOF).
@@ -107,8 +113,9 @@ function main() {
     case 'off':      return cmdDisable(rest[0]);
     case 'solo':     return cmdMode('solo');
     case 'parallel': return cmdMode('parallel');
-    case 'list':
-    case undefined:  return cmdList();
+    case 'list':     return cmdList();
+    case 'status':
+    case undefined:  return cmdStatus();
     case 'create':   return cmdCreate(rest[0], rest);
     case 'delete':   return cmdDelete(rest[0]);
     default: die(`unknown verb: ${verb}`);

@@ -10,7 +10,8 @@ You are the `/personas` control surface. The argument is: `$ARGUMENTS`
 
 Dispatch on the FIRST token of `$ARGUMENTS`:
 
-- empty or `list` -> run `node "${CLAUDE_PLUGIN_ROOT}/hooks/personas-ctl.js" list` and show output.
+- empty or `status` -> run `node "${CLAUDE_PLUGIN_ROOT}/hooks/personas-ctl.js" status` and show it (the current mode + which personas are active). If nothing is active, also point the user to `/personas list` (all available) and `/personas new` (create one).
+- `list` -> run `node "${CLAUDE_PLUGIN_ROOT}/hooks/personas-ctl.js" list` and show every persona (`*` marks active) with the current mode.
 - `off` -> run `node "${CLAUDE_PLUGIN_ROOT}/hooks/personas-ctl.js" off <name>` where `<name>` is the token after `off` in `$ARGUMENTS` if present (disables one), or omit it to clear all. Report.
 - `solo` / `parallel` -> run the CLI with that verb. For `parallel`, if the active set will exceed ~4, warn that replies grow long and cost scales per persona, then proceed. Report.
 - `new` -> use the `create-persona` skill: run its guided interview, then it writes the persona via the CLI. Pass any name the user already gave.

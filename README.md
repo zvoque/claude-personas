@@ -56,7 +56,8 @@ Everything runs through the `/personas` command. There are **no natural-language
 | `/personas <name>` | Activate a persona. **solo** replaces the current one; **parallel** appends it. |
 | `/personas off [name]` | Deactivate everything, or just one persona. |
 | `/personas solo` · `parallel` | Switch operating mode (parallel warns past ~4 active). |
-| `/personas list` | List personas (`*` = active) and the current mode. |
+| `/personas` · `status` | Status report — the current mode and which personas are active. |
+| `/personas list` | List all available personas (`*` = active). |
 | `/personas new` | Create a persona through a guided interview. |
 | `/personas team [topic]` | Convene your personas as a debate panel, then synthesize. |
 | `/personas delete <name>` | Delete a personal persona (bundled ones are protected). |

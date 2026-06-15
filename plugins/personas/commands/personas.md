@@ -14,6 +14,6 @@ Dispatch on the FIRST token of `$ARGUMENTS`:
 - `off` -> run `node "${CLAUDE_PLUGIN_ROOT}/hooks/personas-ctl.js" off <name>` where `<name>` is the token after `off` in `$ARGUMENTS` if present (disables one), or omit it to clear all. Report.
 - `solo` / `parallel` -> run the CLI with that verb. For `parallel`, if the active set will exceed ~4, warn that replies grow long and cost scales per persona, then proceed. Report.
 - `new` -> use the `create-persona` skill: run its guided interview, then it writes the persona via the CLI. Pass any name the user already gave.
-- `team [topic]` -> invoke the `team` skill (Phase 3). Until then, say it ships in Phase 3.
+- `team [topic]` -> use the `team` skill: it casts a debate panel from your personas on the topic, runs the rounds, and delivers a moderated synthesis. Pass the topic from `$ARGUMENTS`.
 - `delete <name>` -> run the CLI `delete <name>`; relay the result (including any "bundled" / "now active again" message).
 - any other bare token -> a **persona name to activate**: run `node "${CLAUDE_PLUGIN_ROOT}/hooks/personas-ctl.js" enable <token>`. If it succeeds, **read the persona file (`~/.claude/personas/<token>.md`, else `${CLAUDE_PLUGIN_ROOT}/personas/<token>.md`) and adopt that persona for the rest of this turn**, so it's active immediately (later turns are kept active by the hook). If the CLI says "no such persona", relay that and suggest `/personas list`.

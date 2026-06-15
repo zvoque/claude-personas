@@ -1,8 +1,21 @@
-# claude-personas
+<div align="center">
 
-Persistent **personas** for [Claude Code](https://docs.claude.com/en/docs/claude-code) -- named characters (a sharp skeptic, a numbers-driven analyst, a lazy senior dev) that stay in character on *every* turn until you switch them off.
+# 🎭 claude-personas
 
-A normal skill or prompt shapes a single reply, then Claude drifts back to default. A persona doesn't: a hook re-asserts it each turn, so `contrarian` keeps pressure-testing you for the whole session -- not just the message you invoked it on. Run one at a time (**solo**), several at once (**parallel**), author your own through a guided interview, or convene them as a **team** that debates a topic and reports back.
+**Give Claude a mindset that sticks.**
+
+Persistent personas for [Claude Code](https://docs.claude.com/en/docs/claude-code) — pick a persona and Claude holds it on *every* turn, not just the message you invoked it on. Run one, several in **parallel**, or convene them as a **team** that debates a topic and reports back.
+
+[![CommitCrimes](https://commitcrimes.dev/badge/zvoque.svg)](https://commitcrimes.dev/u/zvoque)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-d97757)](https://docs.claude.com/en/docs/claude-code)
+![Node](https://img.shields.io/badge/node-%E2%89%A518-5fa04e)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+</div>
+
+---
+
+A normal skill or prompt shapes a single reply, then Claude drifts back to default. A persona doesn't — a hook re-asserts it each turn, so `contrarian` keeps pressure-testing you for the whole session. Personas are plain Markdown files you own, and you can author new ones through a guided interview.
 
 ## Install
 
@@ -11,58 +24,57 @@ A normal skill or prompt shapes a single reply, then Claude drifts back to defau
 /plugin install personas@claude-personas
 ```
 
-No install scripts, no manual `settings.json` edits. The plugin registers its own hooks. Start a new session (or just send your next prompt) and the hooks are live.
+No install scripts, no manual `settings.json` edits — the plugin registers its own hooks. **Requires Node** (the hooks and CLI are plain Node.js).
 
-**Requires Node.** The hooks and CLI are plain Node.js scripts. bash is used only by the test harness.
+## Quick start
 
-## Usage
-
-Control is via the `/personas` command. There are no natural-language triggers; the hooks never parse prompts for control.
-
-| Command | Effect |
-|---|---|
-| `/personas <name>` | Activate a persona. In solo mode, replaces the current one. In parallel mode, appends it. |
-| `/personas off` | Deactivate all active personas. |
-| `/personas off <name>` | Deactivate one specific persona. |
-| `/personas solo` | Switch to solo mode (only one persona active at a time). |
-| `/personas parallel` | Switch to parallel mode (multiple personas active; a soft warning fires past ~4). |
-| `/personas list` | List available personas; active ones are marked with `*`. Shows current mode. |
-| `/personas delete <name>` | Delete a personal persona. Refuses to delete bundled-only personas. |
-| `/personas new` | Create a persona through a guided interview. |
-| `/personas team [topic]` | Convene your personas as a debate panel on a topic, then synthesize. |
+```text
+/personas contrarian      # Claude becomes a sharp skeptic — and stays one
+/personas off             # back to normal
+/personas list            # what's available, what's active, current mode
+/personas new             # build your own persona, guided
+/personas parallel        # let several run at once
+/personas team "Postgres vs Mongo at our scale"   # your personas debate it
+```
 
 ## Bundled personas
 
-Ships with one persona to start; create your own with `/personas new` or drop a file into `~/.claude/personas/`.
+Ships with one to start — create your own with `/personas new` or drop a file into `~/.claude/personas/`.
 
 | Persona | What it does |
 |---|---|
-| `contrarian` | A sharp, skeptical advisor that pressure-tests every decision instead of validating it: names the load-bearing assumption, fires three concrete counterarguments, proposes a superior alternative, surfaces the blind-spot risk, and ends with a verdict (**Proceed / Reconsider / Stop**). Persists every turn; steps aside for destructive actions and direct questions. |
+| **`contrarian`** | A sharp, skeptical advisor that pressure-tests every decision instead of validating it: names the load-bearing assumption, fires three concrete counterarguments, proposes a superior alternative, surfaces the blind-spot risk, and ends with a verdict — **Proceed / Reconsider / Stop**. Persists every turn; steps aside for destructive actions and direct questions. |
+
+## Usage
+
+Everything runs through the `/personas` command. There are **no natural-language triggers** — the hooks never parse your prompts for control, so nothing fires by accident.
+
+| Command | Effect |
+|---|---|
+| `/personas <name>` | Activate a persona. **solo** replaces the current one; **parallel** appends it. |
+| `/personas off [name]` | Deactivate everything, or just one persona. |
+| `/personas solo` · `parallel` | Switch operating mode (parallel warns past ~4 active). |
+| `/personas list` | List personas (`*` = active) and the current mode. |
+| `/personas new` | Create a persona through a guided interview. |
+| `/personas team [topic]` | Convene your personas as a debate panel, then synthesize. |
+| `/personas delete <name>` | Delete a personal persona (bundled ones are protected). |
 
 ## How it works
 
-**Personas are plain data files, not skills.** Each persona is a Markdown file with `name` and `description` in its frontmatter followed by the persona instructions. Bundled personas live at `plugins/personas/personas/<name>.md`. Personal personas live at `~/.claude/personas/<name>.md`. A personal persona with the same name as a bundled one overrides it.
-
-**Two hooks manage persistence:**
+**Personas are plain data files, not skills** — a Markdown file with `name` + `description` frontmatter and the instructions. Bundled ones ship in the plugin; yours live at `~/.claude/personas/<name>.md` and override a bundled one of the same name.
 
 | Event | Hook | What it does |
 |---|---|---|
-| `UserPromptSubmit` | `personas-tracker.js` | Runs on every prompt. While a persona is active, re-injects the full persona body into `hookSpecificOutput.additionalContext`. That re-injection each turn is what makes the persona stick. The hook self-suppresses on `/personas` command turns so the command itself runs cleanly. |
-| `SessionStart` | `personas-activate.js` | Injects the active persona(s) on turn 0 of a new or resumed session, so the persona is in context before the first prompt. |
+| `UserPromptSubmit` | `personas-tracker.js` | Re-injects the active persona(s) every turn — that's what makes them stick. Self-suppresses on `/personas` turns so commands run clean. |
+| `SessionStart` | `personas-activate.js` | Injects the active persona(s) before the first prompt of a new or resumed session. |
 
-**`personas-ctl.js` is the sole writer of state and persona files.** Both the `/personas` command and the hooks go through it. State is stored at `~/.claude/.personas-active` (JSON).
+`personas-ctl.js` is the **sole writer** of state and persona files; the command and hooks both go through it. State lives at `~/.claude/.personas-active`.
 
-**Default injection is the full persona body each turn.** Set `PERSONAS_TERSE=1` in your environment to switch to a short re-assertion instead. Validate that terse mode holds the persona over a long session before relying on it.
+Injection defaults to the **full** persona body each turn. Set `PERSONAS_TERSE=1` for a short re-assertion instead — validate it holds the persona over a long session first.
 
 ## Adding a persona
 
-The fastest path is `/personas new` -- a guided interview that writes the persona for you. Or drop a Markdown file into `~/.claude/personas/` by hand:
-
-```
-~/.claude/personas/<name>.md
-```
-
-Frontmatter must include `name` and `description`:
+Fastest: `/personas new` — a guided interview that drafts the persona and writes it for you. Or by hand, drop this at `~/.claude/personas/<name>.md`:
 
 ```markdown
 ---
@@ -70,23 +82,19 @@ name: <name>
 description: <short description>
 ---
 
-<persona instructions -- written as if addressed to Claude>
+<persona instructions — written as if addressed to Claude>
 ```
 
-The hooks pick up personal personas immediately. No reinstall needed.
-
-To contribute a bundled persona, add the file to `plugins/personas/personas/<name>.md` and open a PR.
+The hooks pick it up immediately, no reinstall. To contribute a bundled persona, add it under `plugins/personas/personas/` and open a PR.
 
 ## Coexistence with other plugins
 
-`claude-personas` uses isolated state (`.personas-active`) and its own `/personas` namespace; it never edits `settings.json`. It stacks additively with other persona or lifecycle plugins (caveman, ponytail, etc.) -- that is the platform's nature. When those other plugins are also active, their rules and this plugin's rules all apply.
-
-For a clean `/personas team` debate, you will want to pause other persona plugins for that session. This plugin only guarantees that its own persona injection is suppressed on the moderator turn; it cannot silence other plugins.
+`claude-personas` uses isolated state (`.personas-active`) and its own `/personas` namespace, and never edits `settings.json`. It stacks additively with other persona/lifecycle plugins ([caveman](https://github.com/JuliusBrussee/caveman), ponytail) — when they're active too, all their rules apply alongside these. For a clean `/personas team` debate, pause the others; this plugin only guarantees *its own* persona is suppressed on the moderator turn.
 
 ## Credits
 
-Inspired by [caveman](https://github.com/JuliusBrussee/caveman) -- the persona-mode plugin that pioneered the hook-driven "stay in character every turn" pattern this builds on. `claude-personas` generalizes that idea: any number of user-defined personas, solo / parallel / team modes, and a guided creator.
+Inspired by [caveman](https://github.com/JuliusBrussee/caveman) — the persona-mode plugin that pioneered the hook-driven "stay in character every turn" pattern this builds on. `claude-personas` generalizes it: any number of user-defined personas, solo / parallel / team modes, and a guided creator.
 
 ## License
 
-MIT
+[MIT](LICENSE)

@@ -1,13 +1,13 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "claude-personas",
-  "description": "Persistent persona modes for Claude Code.",
+  "description": "Persistent personas for Claude Code — pick a mindset and Claude holds it every turn.",
   "owner": { "name": "zvoque", "email": "prod@zvoque.com" },
   "plugins": [
     {
       "name": "personas",
       "source": "./plugins/personas",
-      "description": "Persistent persona modes — personas that re-assert every turn until switched off. Command-controlled (/personas), node hooks, single or parallel personas, an on-demand team debate, and a guided persona creator."
+      "description": "Give Claude a mindset that sticks: persistent personas that re-assert every turn. Run one, several in parallel, or convene them as a team that debates a topic — plus a guided persona creator. Command-controlled; never edits settings.json."
     }
   ]
 }

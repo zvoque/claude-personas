@@ -27,7 +27,7 @@ Ask only what you can't confidently infer. Put the questions you still need into
 Infer defaults from the intent. Never ask a question the intent already answers.
 
 ## 3. Name (skip if given)
-If there's no name yet, **propose** one derived from the intent and ask the user to accept or change it — don't make them invent it cold. It must be lowercase `a-z 0-9 -`, start with a letter/digit, and must NOT be a reserved verb (`list off on solo parallel team new delete help`). Re-propose if invalid or taken.
+If there's no name yet, **propose** one derived from the intent and ask the user to accept or change it — don't make them invent it cold. It must be lowercase `a-z 0-9 -`, start with a letter/digit, and must NOT be a reserved verb (`list status off on solo parallel team new delete help suspend resume`). Re-propose if invalid or taken.
 
 ## 4. Draft + review — NEVER skip
 Assemble the persona body as direct, second-person instructions to Claude: an opening line stating the role, the response shape (a short labeled structure if they chose one), the voice, and a "step aside (plain mode) for" section. Tight and concrete. Do NOT add any "deactivate by saying …" clause (off is uniform: `/personas off`).
@@ -38,10 +38,10 @@ Assemble the persona body as direct, second-person instructions to Claude: an op
 On approval, write the approved body to a temp file with the Write tool, then:
 
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}/hooks/personas-ctl.js" create <name> --desc "<one-line description>" < /tmp/persona-body.md
+node "$(ls -t ~/.claude/plugins/cache/*/*/*/hooks/personas-ctl.js 2>/dev/null | head -1)" create <name> --desc "<one-line description>" < /tmp/persona-body.md
 ```
 
 The CLI validates the name, rejects reserved/duplicate names, writes valid frontmatter atomically to `~/.claude/personas/<name>.md`, and warns if it overrides a bundled persona. Relay its output. On error (reserved name, already exists, empty body), fix and retry.
 
 ## 6. Confirm + offer to activate
-Tell the user it's live: activate with `/personas <name>`, deactivate any persona with `/personas off`, and it's automatically eligible as a debater in `/personas team`. Offer to activate it now — if they say yes, run `node "${CLAUDE_PLUGIN_ROOT}/hooks/personas-ctl.js" enable <name>` and adopt the persona for the rest of this turn so it takes effect immediately.
+Tell the user it's live: activate with `/personas <name>`, deactivate any persona with `/personas off`, and it's automatically eligible as a debater in `/personas team`. Offer to activate it now — if they say yes, run `node "$(ls -t ~/.claude/plugins/cache/*/*/*/hooks/personas-ctl.js 2>/dev/null | head -1)" enable <name>` and adopt the persona for the rest of this turn so it takes effect immediately.

@@ -41,9 +41,9 @@ Determine before casting:
 
 The panel is built from the user's personas (each is a `personas/<name>.md` data file). Roster selection is **decoupled from ambient state** — it doesn't matter which personas are currently active.
 
-1. **List personas:** run `node "${CLAUDE_PLUGIN_ROOT}/hooks/personas-ctl.js" list` to get every persona name and which are currently enabled (marked `*`).
+1. **List personas:** run `node "$(ls -t ~/.claude/plugins/cache/*/*/*/hooks/personas-ctl.js 2>/dev/null | head -1)" list` to get every persona name and which are currently enabled (marked `*`).
 2. **Pick the roster (AskUserQuestion):** show all personas, with the currently-enabled ones pre-selected as the default; let the user add/remove. Default to the enabled set if they don't care.
-3. **Derive a debater brief from each chosen persona — do NOT paste the persona body raw.** Read the persona file (`~/.claude/personas/<name>.md`, else `${CLAUDE_PLUGIN_ROOT}/personas/<name>.md`) and extract ONLY the character into the Section 3 brief: identity, core motive, what it fears, voice, starting stance. **Discard its mode-mechanics** — persistence clauses, output-format scaffolds, "step aside" / auto-clarity rules, cross-persona notes. A debater argues a position; it does not run an ambient behavior.
+3. **Derive a debater brief from each chosen persona — do NOT paste the persona body raw.** Read the persona file (`~/.claude/personas/<name>.md`, else the bundled copy at `"$(dirname "$(dirname "$(ls -t ~/.claude/plugins/cache/*/*/*/hooks/personas-ctl.js 2>/dev/null | head -1)")")"/personas/<name>.md`) and extract ONLY the character into the Section 3 brief: identity, core motive, what it fears, voice, starting stance. **Discard its mode-mechanics** — persistence clauses, output-format scaffolds, "step aside" / auto-clarity rules, cross-persona notes. A debater argues a position; it does not run an ambient behavior.
 4. **Friction check (a flat roster is the #1 failure).** Judge whether the chosen personas have genuinely *opposed* incentives. If they're mutually aligned, or some are stylistic with no debate stance (e.g. a terse-output persona), **warn the user and offer to auto-cast one or more opposing debaters** for real conflict (see `references/casting-library.md`). Auto-cast debaters are **ephemeral** — this debate only, never saved. (To keep one, the user makes it a persona via `/personas new`.)
 5. **Minimum two debaters.** If fewer than two would result, gap-fill is required; if the user declines, abort with a one-line explanation.
 
@@ -57,7 +57,7 @@ See `references/casting-library.md` for archetypes and anti-patterns to draw gap
 
 Use the native team primitives so personas can message each other directly.
 
-0. **Pause the user's active personas (auto).** Run `node "${CLAUDE_PLUGIN_ROOT}/hooks/personas-ctl.js" suspend`. This pauses ambient persona injection so the user's own active persona(s) can't bias you as moderator across the debate's turns — it does **not** change the active set or mode, and it's restored in Section 6. Tell the user in one line what was paused, from the CLI output (e.g. "Paused contrarian for the debate — back when we're done"). If the call errors, proceed anyway; the turn-level self-suppress still covers this turn.
+0. **Pause the user's active personas (auto).** Run `node "$(ls -t ~/.claude/plugins/cache/*/*/*/hooks/personas-ctl.js 2>/dev/null | head -1)" suspend`. This pauses ambient persona injection so the user's own active persona(s) can't bias you as moderator across the debate's turns — it does **not** change the active set or mode, and it's restored in Section 6. Tell the user in one line what was paused, from the CLI output (e.g. "Paused contrarian for the debate — back when we're done"). If the call errors, proceed anyway; the turn-level self-suppress still covers this turn.
 1. `TeamCreate` — `team_name` like `debate-<short-topic-slug>`, description = the motion. You are the moderator/team-lead.
 2. Spawn each persona with the **Agent** tool, passing `team_name` and a `name` (the persona's name, kebab/lower e.g. `senior-dev`, `the-skeptic`). Use `subagent_type: "general-purpose"` (or `claude`) so they can reason and search freely — personas don't need file-editing tools but benefit from web/research access for factual debates.
 3. Each persona's spawn `prompt` is its **character brief** — see template below. Spawn them in the **same message** (parallel) so they're all live.
@@ -130,7 +130,7 @@ Two parts:
 After synthesis, shut the team down **and restore the user's personas**:
 1. `SendMessage` each persona `{type: "shutdown_request"}`.
 2. Once all are down, `TeamDelete`.
-3. **Restore the user's personas (auto).** Run `node "${CLAUDE_PLUGIN_ROOT}/hooks/personas-ctl.js" resume` and confirm in one line (e.g. "Restored: contrarian"). This MUST run **last**, and **even if the debate errored or was cut short** — otherwise injection stays paused. (Safety net: a stranded pause also auto-expires on its own within ~30 min, and any manual activation or fresh session clears it instantly — but don't rely on it; always run `resume`.)
+3. **Restore the user's personas (auto).** Run `node "$(ls -t ~/.claude/plugins/cache/*/*/*/hooks/personas-ctl.js 2>/dev/null | head -1)" resume` and confirm in one line (e.g. "Restored: contrarian"). This MUST run **last**, and **even if the debate errored or was cut short** — otherwise injection stays paused. (Safety net: a stranded pause also auto-expires on its own within ~30 min, and any manual activation or fresh session clears it instantly — but don't rely on it; always run `resume`.)
 
 Do all of this even if the debate is cut short. Don't leave agents running or personas paused.
 

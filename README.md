@@ -21,29 +21,27 @@ A normal skill or prompt shapes a single reply, then Claude drifts back to defau
 
 ```
 /plugin marketplace add zvoque/claude-personas
-/plugin install claude-personas@claude-personas
+/plugin install personas@claude-personas
 ```
 
 No install scripts, no manual `settings.json` edits — the plugin registers its own hooks. **Requires Node** (the hooks and CLI are plain Node.js).
 
-To remove it later: `claude plugin uninstall claude-personas@claude-personas`.
+To remove it later: `claude plugin uninstall personas@claude-personas`.
 
 ## Quick start
 
-The command is **`/claude-personas:personas`** — Claude Code namespaces plugin commands, so bare `/personas` won't resolve. Type `/claude-p` then **Tab** to autocomplete it.
-
 ```text
-/claude-personas:personas contrarian   # Claude becomes a sharp skeptic — and stays one
-/claude-personas:personas off          # back to normal
-/claude-personas:personas list         # what's available, what's active, current mode
-/claude-personas:personas new          # build your own persona, guided
-/claude-personas:personas parallel     # let several run at once
-/claude-personas:personas team "Postgres vs Mongo at our scale"   # your personas debate it
+/personas contrarian      # Claude becomes a sharp skeptic — and stays one
+/personas off             # back to normal
+/personas list            # what's available, what's active, current mode
+/personas new             # build your own persona, guided
+/personas parallel        # let several run at once
+/personas team "Postgres vs Mongo at our scale"   # your personas debate it
 ```
 
 ## Bundled personas
 
-Ships with one to start — create your own with `/claude-personas:personas new` or drop a file into `~/.claude/personas/`.
+Ships with one to start — create your own with `/personas new` or drop a file into `~/.claude/personas/`.
 
 | Persona | What it does |
 |---|---|
@@ -51,7 +49,7 @@ Ships with one to start — create your own with `/claude-personas:personas new`
 
 ## Usage
 
-Everything runs through the **`/claude-personas:personas`** command — there are **no natural-language triggers** (the hooks never parse your prompts for control, so nothing fires by accident). Each row below is a `<verb>` you pass to it, e.g. `/claude-personas:personas off`:
+Everything runs through the **`/personas`** command — there are **no natural-language triggers** (the hooks never parse your prompts for control, so nothing fires by accident). Each row below is a `<verb>` you pass to it, e.g. `/personas off`:
 
 | `<verb>` | Effect |
 |---|---|
@@ -70,7 +68,7 @@ Everything runs through the **`/claude-personas:personas`** command — there ar
 
 | Event | Hook | What it does |
 |---|---|---|
-| `UserPromptSubmit` | `personas-tracker.js` | Re-injects the active persona(s) every turn — that's what makes them stick. Self-suppresses on `/claude-personas:personas` turns so commands run clean. |
+| `UserPromptSubmit` | `personas-tracker.js` | Re-injects the active persona(s) every turn — that's what makes them stick. Self-suppresses on `/personas` turns so commands run clean. |
 | `SessionStart` | `personas-activate.js` | Injects the active persona(s) before the first prompt of a new or resumed session. |
 
 `personas-ctl.js` is the **sole writer** of state and persona files; the command and hooks both go through it. State lives at `~/.claude/.personas-active`.
@@ -79,10 +77,10 @@ Injection defaults to the **full** persona body each turn. Set `PERSONAS_TERSE=1
 
 ## Team debates
 
-`/claude-personas:personas team [topic]` turns your personas into a panel that argues a question. Claude acts as **moderator** — casts the panel, runs the rounds, and hands you a synthesis. Your active personas are **auto-paused** for the duration so they can't bias the moderator, then restored when it's done — your enabled set and solo/parallel mode are never touched (and if a debate ever dies before cleanup, the pause self-heals on its own — it auto-expires, no restart needed).
+`/personas team [topic]` turns your personas into a panel that argues a question. Claude acts as **moderator** — casts the panel, runs the rounds, and hands you a synthesis. Your active personas are **auto-paused** for the duration so they can't bias the moderator, then restored when it's done — your enabled set and solo/parallel mode are never touched (and if a debate ever dies before cleanup, the pause self-heals on its own — it auto-expires, no restart needed).
 
 1. **Cast the roster.** You pick which personas debate (your currently-active ones are pre-selected). The panel is independent of solo/parallel mode — convening a team doesn't change what's active.
-2. **Fill the gaps (auto-cast).** A debate is only useful if the sides genuinely disagree. If your picks are too aligned — or one is a pure *style* with no stance to argue — it offers to **auto-cast** extra debaters drawn for the topic (a skeptic, an opposing stakeholder) to create real friction. These are ephemeral: used for this debate only, never saved. Want to keep one? `/claude-personas:personas new`.
+2. **Fill the gaps (auto-cast).** A debate is only useful if the sides genuinely disagree. If your picks are too aligned — or one is a pure *style* with no stance to argue — it offers to **auto-cast** extra debaters drawn for the topic (a skeptic, an opposing stakeholder) to create real friction. These are ephemeral: used for this debate only, never saved. Want to keep one? `/personas new`.
 3. **They argue.** Each debater is spawned as its own agent, and they go at it via native inter-agent messaging — opening positions, direct clashes, a pressure round — rather than one model puppeting every side.
 4. **You get a synthesis.** Key tensions, where they converged, the strongest point each side landed, what the answer depends on, and a verdict.
 
@@ -90,7 +88,7 @@ Injection defaults to the **full** persona body each turn. Set `PERSONAS_TERSE=1
 
 ## Adding a persona
 
-Fastest: `/claude-personas:personas new` — a guided interview that drafts the persona and writes it for you. Or by hand, drop this at `~/.claude/personas/<name>.md`:
+Fastest: `/personas new` — a guided interview that drafts the persona and writes it for you. Or by hand, drop this at `~/.claude/personas/<name>.md`:
 
 ```markdown
 ---
@@ -105,7 +103,7 @@ The hooks pick it up immediately, no reinstall. To contribute a bundled persona,
 
 ## Coexistence with other plugins
 
-`claude-personas` uses isolated state (`.personas-active`) and its own `/claude-personas:personas` namespace, and never edits `settings.json`. It stacks additively with other persona/lifecycle plugins ([caveman](https://github.com/JuliusBrussee/caveman), [ponytail](https://github.com/DietrichGebert/ponytail)) — when they're active too, all their rules apply alongside these. For a clean `/claude-personas:personas team` debate, pause the others; this plugin only guarantees *its own* persona is suppressed on the moderator turn.
+`claude-personas` uses isolated state (`.personas-active`) and its own `/personas` namespace, and never edits `settings.json`. It stacks additively with other persona/lifecycle plugins ([caveman](https://github.com/JuliusBrussee/caveman), [ponytail](https://github.com/DietrichGebert/ponytail)) — when they're active too, all their rules apply alongside these. For a clean `/personas team` debate, pause the others; this plugin only guarantees *its own* persona is suppressed on the moderator turn.
 
 ## Credits
 

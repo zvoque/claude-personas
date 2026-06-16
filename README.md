@@ -21,12 +21,12 @@ A normal skill or prompt shapes a single reply, then Claude drifts back to defau
 
 ```
 /plugin marketplace add zvoque/claude-personas
-/plugin install personas@claude-personas
+/plugin install claude-personas@claude-personas
 ```
 
 No install scripts, no manual `settings.json` edits — the plugin registers its own hooks. **Requires Node** (the hooks and CLI are plain Node.js).
 
-To remove it later: `claude plugin uninstall personas@claude-personas`.
+To remove it later: `claude plugin uninstall claude-personas@claude-personas`.
 
 ## Quick start
 

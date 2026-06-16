@@ -5,7 +5,7 @@
   "owner": { "name": "zvoque", "email": "prod@zvoque.com" },
   "plugins": [
     {
-      "name": "personas",
+      "name": "claude-personas",
       "source": "./plugins/personas",
       "description": "Give Claude a mindset that sticks: persistent personas that re-assert every turn. Run one, several in parallel, or convene them as a team that debates a topic — plus a guided persona creator. Command-controlled; never edits settings.json."
     }

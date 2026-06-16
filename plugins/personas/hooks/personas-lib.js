@@ -103,7 +103,10 @@ function readPersonaBody(name) {
 }
 
 function isPersonasCommand(prompt) {
-  return /^\s*\/personas(\s|$)/i.test(String(prompt || ''));
+  // Match the command in any form CC may pass through: bare /personas, or the
+  // namespaced /personas:personas / /claude-personas:personas (the installed form,
+  // since plugin commands resolve only as /<plugin>:<command>).
+  return /^\s*\/(?:[a-z0-9-]+:)?personas(?:\s|$)/i.test(String(prompt || ''));
 }
 
 const PARALLEL_HEADER =

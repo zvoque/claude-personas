@@ -110,6 +110,14 @@ The hooks pick it up immediately, no reinstall. To contribute a bundled persona,
 
 Inspired by [caveman](https://github.com/JuliusBrussee/caveman), the persona-mode plugin that pioneered the hook-driven "stay in character every turn" pattern this builds on. `claude-personas` generalizes it: any number of user-defined personas, solo / parallel / team modes, and a guided creator.
 
+## More Claude Code plugins
+
+Other plugins I've built, same philosophy: low-friction, safe, and they never touch your `settings.json`.
+
+- **[passive-adr](https://github.com/zvoque/passive-adr)**: decision memory. It watches for architecturally-significant choices (made by you or the agent), records each as an ADR with its rationale, and feeds them back into every future session so settled decisions are honored instead of silently reversed. No prompts; a background sweep does it at session end.
+- **[groundskeeper](https://github.com/zvoque/groundskeeper)**: skill-set housekeeping. It tracks which skills you actually invoke, flags the ones that have gone cold, and helps you reversibly prune the unused ones. Zero token cost during normal work; speaks up at most once a week, and only when something's gone stale.
+- **[wtf-claude](https://github.com/zvoque/wtf-claude)**: a read-only post-mortem for when a session gets messy. Run `/wtf` and it reconstructs what the agent tried, what actually changed, what broke, what it guessed, and exactly what to do next. Never runs destructive git; it only diagnoses.
+
 ## License
 
 [MIT](LICENSE)

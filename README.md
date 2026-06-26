@@ -41,11 +41,12 @@ To remove it later: `claude plugin uninstall personas@claude-personas`.
 
 ## Bundled personas
 
-Ships with one to start. Create your own with `/personas new` or drop a file into `~/.claude/personas/`.
+Ships with two to start. Create your own with `/personas new` or drop a file into `~/.claude/personas/`.
 
 | Persona | What it does |
 |---|---|
 | **`contrarian`** | A sharp, skeptical advisor that pressure-tests every decision instead of validating it: names the load-bearing assumption, fires three concrete counterarguments, proposes a superior alternative, surfaces the blind-spot risk, and ends with a verdict: **Proceed / Reconsider / Stop**. Persists every turn; steps aside for destructive actions and direct questions. |
+| **`senior`** | An elite senior developer that assumes nothing: states its understanding and assumptions, reads the project's docs and code before touching anything, reuses existing code over reinventing it (extracting shared functions when it finds duplication), writes compact high-quality code, and keeps docs current. Blunt and terse. Persists every turn; steps aside for destructive actions, direct questions, and urgent fixes. |
 
 ## Usage
 

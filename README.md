@@ -31,7 +31,7 @@ To remove it later: `claude plugin uninstall personas@claude-personas`.
 ## Quick start
 
 ```text
-/personas contrarian      # Claude becomes a sharp skeptic, and stays one
+/personas <persona>       # activate one (e.g. contrarian, senior); Claude adopts it and stays that way
 /personas off             # back to normal
 /personas list            # what's available, what's active, current mode
 /personas new             # build your own persona, guided

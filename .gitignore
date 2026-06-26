@@ -5,3 +5,5 @@
 docs/
 tests/
 CONTEXT.md
+
+.adr/

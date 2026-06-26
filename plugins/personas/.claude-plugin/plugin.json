@@ -2,7 +2,7 @@
   "name": "personas",
   "displayName": "Personas",
   "description": "Give Claude a mindset that sticks: persistent personas that re-assert every turn. Run one, several in parallel, or convene them as a team that debates a topic — plus a guided persona creator. Command-controlled; never edits settings.json.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": { "name": "zvoque" },
   "homepage": "https://github.com/zvoque/claude-personas",
   "repository": "https://github.com/zvoque/claude-personas",

@@ -48,7 +48,7 @@ Reload VS Code (**Developer: Reload Window**) and it appears in the agent dropdo
 
 ### Add it to the Team
 
-The **Team** agent only convenes personas it knows about. Two ways to include yours:
+The **Team** agent only convenes personas it knows about. If you made yours with **Agent Creator**, it offers to wire this up for you. To do it by hand, two ways:
 
 - **Permanent:** add its `name` to the `agents:` list in [`agents/team.agent.md`](agents/team.agent.md):
   ```yaml

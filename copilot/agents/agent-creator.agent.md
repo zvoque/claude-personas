@@ -37,6 +37,6 @@ name: <DisplayName>
 
 Confirm the path you wrote.
 
-## 6. Tell them how to use it
+## 6. Wire it in
 - **Reload** VS Code (Developer: Reload Window) so it appears in the agent dropdown.
-- To include it in debates, add its `name` to the `agents:` list in `team.agent.md`, or just name it when starting a debate ("debate this with Senior and <Name>").
+- **Offer to add it to the Team.** Ask if they want this persona available in debates. If yes, find `team.agent.md` in the same agents folder (`~/.copilot/agents/team.agent.md`, or `.github/agents/team.agent.md` for a project install) and append the new `name` to its `agents:` list, e.g. `agents: ['Senior', 'Contrarian', 'Analyst']`. Confirm the edit. If they decline, remind them they can still name it inline when starting a debate ("debate this with Senior and <Name>").

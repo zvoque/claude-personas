@@ -4,6 +4,8 @@ The same personas, packaged as **GitHub Copilot custom agents** (`.agent.md`). U
 
 > **This is the install for the Copilot extension** (the chat panel in VS Code). On the **Copilot CLI**, you can instead run the full Claude plugin with the same commands as Claude Code; see [Using GitHub Copilot](../README.md#using-github-copilot) in the main README.
 >
+> **It behaves differently from the CLI and the Claude Code plugin.** The extension can't run the plugin, so the personas were rebuilt as custom agents: you *select* one from a dropdown instead of toggling an ambient `/personas` mode, and a few features change shape. See [What's different](#whats-different-from-the-claude-version) below before you expect parity.
+>
 > **Recommended: use a Claude model.** These agents are tested on Claude; behaviour on other models is unverified.
 
 ## Install
@@ -63,6 +65,8 @@ The **Team** agent only convenes personas it knows about. If you made yours with
 Names must match the `name:` field in each persona file, not the filename.
 
 ## What's different from the Claude version
+
+The extension can't load the Claude Code plugin, so these personas are a **reimplementation as custom agents**, not the same engine. Expect these differences:
 
 Copilot custom agents are single-select and persistent-by-platform. So persistence is free (no hook), and a single persona just works. The Claude plugin's `team`/`parallel` are reproduced by the **Team** agent, which orchestrates the others rather than running them ambiently. What doesn't carry over is the `/personas` command surface and live mode-switching (`off`, `suspend`/`resume`); you switch agents from the dropdown instead.
 

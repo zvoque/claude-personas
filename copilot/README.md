@@ -1,6 +1,10 @@
 # Personas for GitHub Copilot
 
-The same personas, packaged as **GitHub Copilot custom agents** (`.agent.md`). Unlike the Claude Code plugin, persistence is native here: Copilot re-applies the selected agent every turn, so there's no hook and nothing to install. These are just two files.
+The same personas, packaged as **GitHub Copilot custom agents** (`.agent.md`). Unlike the Claude Code plugin, persistence is native here: Copilot re-applies the selected agent every turn, so there's no hook and nothing to install. These are just files.
+
+> **This is the install for the Copilot extension** (the chat panel in VS Code). On the **Copilot CLI**, you can instead run the full Claude plugin with the same commands as Claude Code; see [Using GitHub Copilot](../README.md#using-github-copilot) in the main README.
+>
+> **Recommended: use a Claude model.** These agents are tested on Claude; behaviour on other models is unverified.
 
 ## Install
 

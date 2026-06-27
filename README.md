@@ -30,13 +30,22 @@ No install scripts, no manual `settings.json` edits; the plugin registers its ow
 
 To remove it later: `claude plugin uninstall personas@claude-personas`.
 
-### Using GitHub Copilot instead?
+### Using GitHub Copilot?
 
-The same personas are packaged as Copilot custom agents (`.agent.md`). They're just files in `~/.copilot/agents/`, so the easiest install is to ask your agent:
+Copilot has two surfaces, and they install differently.
 
-> Install the Copilot personas from https://github.com/zvoque/claude-personas: write each `.agent.md` under `copilot/agents/` into my `~/.copilot/agents/` directory, then tell me to reload VS Code.
+**Copilot CLI** is Claude Code compatible, so it runs the real plugin with the same commands:
 
-Manual steps and team setup in [`copilot/`](copilot).
+```
+/plugin marketplace add zvoque/claude-personas
+/plugin install personas@claude-personas
+```
+
+You get the full thing: persistent personas, parallel, debates. The CLI namespaces the command, so you run `/personas:personas <verb>` (e.g. `/personas:personas senior`). Turn on **Chat: Use Claude Hooks** in settings so persistence works.
+
+**The Copilot extension** (the chat panel in VS Code) does not run plugins. Install the personas as Copilot custom agents (`.agent.md` files) instead: see [`copilot/`](copilot).
+
+**Recommended: use a Claude model.** Everything here is tested on Claude; behaviour on other models is unverified.
 
 ## Quick start
 

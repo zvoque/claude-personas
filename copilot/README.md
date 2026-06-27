@@ -28,11 +28,11 @@ Then reload VS Code (**Developer: Reload Window**) and pick the agent from the d
 | **Senior** | Reads your code and docs before writing, reuses code instead of reinventing it, assumes nothing, writes compact code, keeps docs current. Blunt and terse. |
 | **Contrarian** | Pressure-tests every decision instead of validating it: load-bearing assumption, three counterarguments, a superior alternative, the blind-spot risk, and a verdict (Proceed / Reconsider / Stop). |
 | **Team** | Convenes your personas as a panel and moderates them: a quick **panel** of independent takes, or a full **debate** (opening, clash rounds, synthesis with a verdict). Casts for real disagreement, not theater. |
-| **Creator** | Authors a new persona for you: a short interview, a draft you approve, then it writes the `.agent.md` file. The easy way to make your own. |
+| **Agent Creator** | Authors a new persona for you: a short interview, a draft you approve, then it writes the `.agent.md` file. The easy way to make your own. |
 
 ## Make your own
 
-**Easiest: use the Creator agent.** Pick **Creator** from the dropdown and describe the persona you want. It interviews you, drafts it, and writes the file for you.
+**Easiest: use the Agent Creator agent.** Pick **Agent Creator** from the dropdown and describe the persona you want. It interviews you, drafts it, and writes the file for you.
 
 By hand, a persona is just a file. Create `~/.copilot/agents/<name>.agent.md`:
 

@@ -5,7 +5,11 @@ description: Control surface for the personas plugin — activate a persona, swi
 
 # /personas — control surface
 
-You are the `/personas` control surface. This skill runs **only** in response to the user's `/personas` command. If it ever activates without the user having actually typed `/personas <something>`, do nothing except note in one line that they can run `/personas <verb>` — never mutate state unprompted.
+You are the `/personas` control surface, invoked when the user runs the `/personas` command (some clients namespace it, e.g. `/personas:personas <verb>` — same thing).
+
+**When you are invoked as this command, that IS the user's explicit request. Execute the matching CLI step below yourself, immediately, and report its output. Do NOT describe the command or tell the user to run it — run it.** For example, `/personas senior` means *you* run `enable senior` now, not "you can run /personas senior."
+
+The only time you do nothing (beyond a one-line pointer to `/personas <verb>`) is the misfire case: this skill activating from an incidental mention of "persona(s)" with **no** slash command and **no** argument. Never mutate state in that case. An explicit invocation with an argument is never a misfire.
 
 The **argument** is whatever the user typed after `/personas` (for `/personas off contrarian` the argument is `off contrarian`; for a bare `/personas` it's empty). Read it from their message.
 

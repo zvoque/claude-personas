@@ -27,9 +27,12 @@ Then reload VS Code (**Developer: Reload Window**) and pick the agent from the d
 |---|---|
 | **Senior** | Reads your code and docs before writing, reuses code instead of reinventing it, assumes nothing, writes compact code, keeps docs current. Blunt and terse. |
 | **Contrarian** | Pressure-tests every decision instead of validating it: load-bearing assumption, three counterarguments, a superior alternative, the blind-spot risk, and a verdict (Proceed / Reconsider / Stop). |
+| **Team** | Convenes your personas as a panel and moderates them: a quick **panel** of independent takes, or a full **debate** (opening, clash rounds, synthesis with a verdict). Casts for real disagreement, not theater. |
 
 ## What's different from the Claude version
 
-Copilot custom agents are single-select and persistent-by-platform, so the Claude plugin's `parallel`, `team` debates, and `/personas` command surface don't carry over. These files are the personas themselves, adapted: the Claude-specific bits (the persistence preamble, `/personas off`, caveman interaction) are stripped because Copilot doesn't need them.
+Copilot custom agents are single-select and persistent-by-platform. So persistence is free (no hook), and a single persona just works. The Claude plugin's `team`/`parallel` are reproduced by the **Team** agent, which orchestrates the others rather than running them ambiently. What doesn't carry over is the `/personas` command surface and live mode-switching (`off`, `suspend`/`resume`); you switch agents from the dropdown instead.
+
+The persona files are the Claude personas, adapted: the Claude-specific bits (the persistence preamble, `/personas off`, caveman interaction) are stripped because Copilot doesn't need them.
 
 > **Maintainer note:** these `.agent.md` files are hand-maintained, not generated. If you edit a persona in [`../plugins/personas/personas/`](../plugins/personas/personas), update its `.agent.md` here too, or they drift.

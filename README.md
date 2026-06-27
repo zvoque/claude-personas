@@ -6,6 +6,8 @@
 
 Persistent personas for [Claude Code](https://docs.claude.com/en/docs/claude-code): pick a persona and Claude holds it on *every* turn, not just the message you invoked it on. Run one, several in **parallel**, or convene them as a **team** that debates a topic and reports back.
 
+*Built for Claude Code; also installable as [GitHub Copilot custom agents](copilot).*
+
 [![CommitCrimes](https://commitcrimes.dev/badge/zvoque.svg)](https://commitcrimes.dev/u/zvoque)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-d97757)](https://docs.claude.com/en/docs/claude-code)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518-5fa04e)
@@ -27,6 +29,14 @@ A normal skill or prompt shapes a single reply, then Claude drifts back to defau
 No install scripts, no manual `settings.json` edits; the plugin registers its own hooks. **Requires Node** (the hooks and CLI are plain Node.js).
 
 To remove it later: `claude plugin uninstall personas@claude-personas`.
+
+### Using GitHub Copilot instead?
+
+The same personas are packaged as Copilot custom agents (`.agent.md`). They're just files in `~/.copilot/agents/`, so the easiest install is to ask your agent:
+
+> Install the Copilot personas from https://github.com/zvoque/claude-personas: write each `.agent.md` under `copilot/agents/` into my `~/.copilot/agents/` directory, then tell me to reload VS Code.
+
+Manual steps and team setup in [`copilot/`](copilot).
 
 ## Quick start
 
